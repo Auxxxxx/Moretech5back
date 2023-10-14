@@ -1,4 +1,4 @@
-package online.mdfactory.backend.web.util;
+package com.example.moretech5back.web.util;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

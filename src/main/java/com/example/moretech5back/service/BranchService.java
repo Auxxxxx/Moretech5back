@@ -1,52 +1,66 @@
 package com.example.moretech5back.service;
 
-import com.example.moretech5back.exception.UserNotFoundException;
-import com.example.moretech5back.repository.UserRepository;
-import com.example.moretech5back.web.model.User;
+import com.example.moretech5back.exception.BranchNotFoundException;
+import com.example.moretech5back.model.Branch;
+import com.example.moretech5back.repository.BranchRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class UserService {
-    private final UserRepository userRepository;
+public class BranchService {
+    private final BranchRepository branchRepository;
 
-    public List<User> listAll() {
-        return userRepository.findAll();
+    public List<Branch> listAll() {
+        return branchRepository.findAll();
     }
 
-    public void save(String name, String login, String password) {
-        User user;
-        Optional<User> existing = userRepository.findByLogin(login);
-        if (existing.isPresent()) {
-            user = existing.get();
-            user.setPassword(password);
-            user.setName(name);
-        } else {
-            user = User.builder()
-                    .login(login)
-                    .password(password)
+    public List<Branch> findInRange(double xLeft, double xRight, double yUp, double yDown) {
+        List<Branch> all = branchRepository.findInRange(xLeft, xRight, yUp, yDown);
+        return new ArrayList<>(all.subList(0, 100));
+    }
+
+    public List<Branch> findOptimal(double xMe, double yMe) {
+        Comparator<Branch> comparator = (branch1, branch2) -> {
+          int result = 0;
+          double dist1 = distance(branch1, xMe, yMe);
+          double dist2 = distance(branch2, xMe, yMe);
+          return result;
+        };
+        return null;
+    }
+
+    private double distance(Branch branch, double xMe, double yMe) {
+        return Math.sqrt(Math.pow(branch.getX() - xMe, 2) + Math.pow(branch.getY() - yMe, 2));
+    }
+
+    public void save(String name,
+                     String address,
+                     Long load,
+                     Double x,
+                     Double y) {
+        Branch branch = Branch.builder()
                     .name(name)
+                    .address(address)
+                    .load(load)
+                    .x(x)
+                    .y(y)
                     .build();
-        }
-        userRepository.save(user);
+        branchRepository.save(branch);
     }
 
-    public User get(String login) throws UserNotFoundException {
-        return userRepository.findByLogin(login).orElseThrow(UserNotFoundException::new);
-    }
-
-    public String getName(String login) throws UserNotFoundException {
-        Optional<User> employee = userRepository.findByLogin(login);
-        return employee.map(User::getName).orElseThrow(UserNotFoundException::new);
+    public Branch get(Long id) throws BranchNotFoundException {
+        return branchRepository.findById(id).orElseThrow(BranchNotFoundException::new);
     }
 
     @Transactional
-    public void delete(String login) {
-        userRepository.deleteByLogin(login);
+    public void delete(Long id) {
+        branchRepository.deleteById(id);
     }
 }

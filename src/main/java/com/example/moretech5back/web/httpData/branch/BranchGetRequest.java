@@ -1,4 +1,4 @@
-package com.example.moretech5back.web.httpData.employee;
+package com.example.moretech5back.web.httpData.branch;
 
 import lombok.Builder;
 import lombok.Data;
@@ -7,6 +7,6 @@ import lombok.extern.jackson.Jacksonized;
 @Data
 @Builder
 @Jacksonized
-public class UserGetRequest {
-    private String login;
+public class BranchGetRequest {
+    private Long id;
 }

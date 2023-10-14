@@ -1,8 +1,8 @@
 package com.example.moretech5back.web.controller;
 
-import com.example.moretech5back.exception.UserNotFoundException;
-import com.example.moretech5back.service.UserService;
-import com.example.moretech5back.web.httpData.employee.*;
+import com.example.moretech5back.exception.BranchNotFoundException;
+import com.example.moretech5back.service.BranchService;
+import com.example.moretech5back.web.httpData.branch.*;
 import com.example.moretech5back.web.util.RequestData;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,74 +14,52 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(path = "/user", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/branch", produces = MediaType.APPLICATION_JSON_VALUE)
 @AllArgsConstructor
 @Slf4j
-public class UserController {
-    private final UserService userService;
+public class BranchController {
+    private final BranchService branchService;
 
     @PostMapping("/list")
-    public ResponseEntity<UserListResponse> list() {
-        log.info("returning_employee_list");
-        var employees = userService.listAll();
-        var response = UserListResponse.builder()
-                .employees(employees)
+    public ResponseEntity<BranchListResponse> list() {
+        log.info("returning_branch_list");
+        var branches = branchService.listAll();
+        var response = BranchListResponse.builder()
+                .branches(branches)
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/find-in-range")
+    public ResponseEntity<BranchFindInRangeResponse> findInRange(
+            @RequestData BranchFindInRangeRequest request) {
+        log.info("returning_branch_list_in_range: " + request.toString());
+        var branches = branchService.findInRange(
+                request.getXLeft(),
+                request.getXRight(),
+                request.getYUp(),
+                request.getYDown());
+        var response = BranchFindInRangeResponse.builder()
+                .branches(branches)
                 .build();
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/get")
-    public ResponseEntity<UserGetResponse> get(
-            @RequestData UserGetNameRequest request) {
-        log.info("fetching_employee: " + request.getLogin());
+    public ResponseEntity<BranchGetResponse> get(
+            @RequestData BranchGetRequest request) {
+        log.info("fetching_batch: " + request.getId());
         try {
-            var user = userService.get(request.getLogin());
-            var response = UserGetResponse.builder()
-                    .user(user)
+            var branch = branchService.get(request.getId());
+            var response = BranchGetResponse.builder()
+                    .branch(branch)
                     .build();
             return ResponseEntity.ok(response);
-        } catch (UserNotFoundException e) {
-            log.error("employee_not_found: " + request.getLogin());
+        } catch (BranchNotFoundException e) {
+            log.error("branch_not_found: " + request.getId());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         }
-    }
-
-    @PostMapping("/get-name")
-    public ResponseEntity<UserGetNameResponse> getName(
-            @RequestData UserGetNameRequest request) {
-        log.info("fetching_name: " + request.getLogin());
-        try {
-            var name = userService.get(request.getLogin()).getName();
-            var response = UserGetNameResponse.builder()
-                    .name(name)
-                    .build();
-            return ResponseEntity.ok(response);
-        } catch (UserNotFoundException e) {
-            log.error("employee_not_found: " + request.getLogin());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
-        }
-    }
-
-    @PostMapping("/put")
-    public ResponseEntity<Void> put(
-            @RequestData UserPutRequest request) {
-        log.info("saving_employee: " + request.getLogin());
-
-        userService.save(
-                request.getName(),
-                request.getLogin(),
-                request.getPassword());
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    @PostMapping("/delete")
-    public ResponseEntity<Void> delete(
-            @RequestData UserDeleteRequest request) {
-        log.info("deleting_employee: " + request.getLogin());
-        userService.delete(request.getLogin());
-        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }

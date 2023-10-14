@@ -1,4 +1,4 @@
-package online.mdfactory.backend.exception;
+package com.example.moretech5back.exception;
 
 import lombok.NoArgsConstructor;
 

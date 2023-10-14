@@ -10,7 +10,6 @@ import java.util.List;
 @Data
 @Builder
 @Jacksonized
-public class BranchListResponse {
+public class BranchFindInRangeResponse {
     private List<Branch> branches;
 }
-

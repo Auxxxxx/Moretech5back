@@ -6,10 +6,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.*;
+import org.springframework.data.geo.Point;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.List;
 
 @Entity
 @Data
@@ -17,14 +16,16 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @ToString(onlyExplicitlyIncluded = true)
-@Table(name = "_user")
-public class User implements Serializable {
+@Table(name = "branch")
+public class Branch implements Serializable {
     @Id
     @GeneratedValue
     @JsonIgnore
     @ToString.Include
     private Long id;
-    private String login;
     private String name;
-    private String password;
+    private String address;
+    private Long load;
+    private Double x;
+    private Double y;
 }

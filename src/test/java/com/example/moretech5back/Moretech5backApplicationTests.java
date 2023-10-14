@@ -8,3 +8,6 @@ class Moretech5backApplicationTests {
 
     @Test
     void contextLoads() {
+    }
+
+}

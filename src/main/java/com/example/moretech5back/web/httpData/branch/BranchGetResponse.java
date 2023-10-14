@@ -1,5 +1,6 @@
 package com.example.moretech5back.web.httpData.branch;
 
+import com.example.moretech5back.model.Branch;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
@@ -10,9 +11,5 @@ import java.awt.*;
 @Builder
 @Jacksonized
 public class BranchGetResponse {
-    private Long id;
-    private String name;
-    private String address;
-    private Long load;
-    private Point coordinates;
+    private Branch branch;
 }

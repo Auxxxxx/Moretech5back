@@ -1,17 +1,16 @@
 package com.example.moretech5back.repository;
 
-import com.example.moretech5back.model.User;
+import com.example.moretech5back.model.Branch;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, Long> {
-
-    Optional<User> findByLogin(String login);
-
-    List<User> findByLoginIn(List<String> logins);
-
-    void deleteByLogin(String login);
-
+public interface BranchRepository extends JpaRepository<Branch, Long> {
+    @Query(" select b from Branch b" +
+            " where b.x >= :xLeft and b.x <= :xRight and b.y >= :yUp and b.y <= :yDown")
+    List<Branch> findInRange(double xLeft,
+                             double xRight,
+                             double yUp,
+                             double yDown);
 }
