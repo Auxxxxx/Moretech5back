@@ -30,6 +30,8 @@ public class Branch implements Serializable {
     private String address;
     @ManyToMany(cascade = CascadeType.ALL)
     private SortedMap<DayOfWeek, DaySchedule> dailyLoad;
+    private Double grade;
+    private Long amountOfReviews;
     private Long load;
     private Double x;
     private Double y;

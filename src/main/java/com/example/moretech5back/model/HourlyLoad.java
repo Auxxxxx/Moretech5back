@@ -3,11 +3,7 @@ package com.example.moretech5back.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.BatchSize;
 
-import java.time.DayOfWeek;
-import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 
 @Entity
@@ -16,15 +12,13 @@ import java.util.SortedMap;
 @AllArgsConstructor
 @Builder
 @ToString(onlyExplicitlyIncluded = true)
-@Table(name = "day_schedule")
-public class DaySchedule {
+@Table(name = "hourly_load")
+public class HourlyLoad {
     @Id
     @GeneratedValue
     @JsonIgnore
     @ToString.Include
     private Long id;
-    private String hours;
-    private Boolean works;
-    @ManyToMany(cascade = CascadeType.ALL)
-    private List<HourlyLoad> hourlyLoads;
+    private Long hour;
+    private Long load;
 }

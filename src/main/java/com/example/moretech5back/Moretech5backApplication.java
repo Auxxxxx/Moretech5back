@@ -1,7 +1,10 @@
 package com.example.moretech5back;
 
+import com.example.moretech5back.model.ATM;
 import com.example.moretech5back.model.Branch;
 import com.example.moretech5back.model.DaySchedule;
+import com.example.moretech5back.model.HourlyLoad;
+import com.example.moretech5back.service.ATMService;
 import com.example.moretech5back.service.BranchService;
 import com.example.moretech5back.service.JsonParserService;
 import com.google.gson.JsonArray;
@@ -16,9 +19,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
 
-import java.io.File;
 import java.net.InetAddress;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.time.DayOfWeek;
 import java.util.*;
@@ -29,6 +30,8 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Moretech5backApplication extends SpringBootServletInitializer {
     @Value("classpath:data/offices.txt")
     private Resource officesFile;
+    @Value("classpath:data/atms.txt")
+    private Resource atmsFile;
     private List<DayOfWeek> dayOfWeekList = new ArrayList<>() {
         {
             add(DayOfWeek.MONDAY);
@@ -53,11 +56,17 @@ public class Moretech5backApplication extends SpringBootServletInitializer {
 
     @Bean
     public CommandLineRunner commandLineRunner(JsonParserService jsonParserService,
-                                               BranchService branchService) {
+                                               BranchService branchService,
+                                               ATMService atmService) {
         return args -> {
-            JsonArray array = jsonParserService.getRoot(officesFile.getInputStream());
-            parseOffices(branchService, array);
-
+            JsonArray officesArray = jsonParserService
+                    .getRoot(officesFile.getInputStream())
+                    .getAsJsonArray();
+            parseOffices(branchService, officesArray);
+            JsonObject atmsObject = jsonParserService
+                    .getRoot(atmsFile.getInputStream())
+                    .getAsJsonObject();
+            parseAtms(atmService, atmsObject);
         };
     }
 
@@ -78,9 +87,18 @@ public class Moretech5backApplication extends SpringBootServletInitializer {
                     hours = "09:00-18:00";
                     works = true;
                 }
+                List<HourlyLoad> hourlyLoadList = new ArrayList<>();
+                for (long i = 9; i <= 17; i++) {
+                    Long loadLocal = ThreadLocalRandom.current().nextLong(1, 11);
+                    HourlyLoad hourlyLoad = HourlyLoad.builder()
+                            .hour(i)
+                            .load(loadLocal)
+                            .build();
+                    hourlyLoadList.add(hourlyLoad);
+                }
                 DaySchedule daySchedule = DaySchedule.builder()
                         .hours(hours)
-                        .load(load)
+                        .hourlyLoads(hourlyLoadList)
                         .works(works)
                         .build();
                 dailyLoad.put(dayOfWeek, daySchedule);
@@ -89,11 +107,16 @@ public class Moretech5backApplication extends SpringBootServletInitializer {
             double x = jsonObject.get("latitude").getAsDouble();
             double y = jsonObject.get("longitude").getAsDouble();
 
+            double grade = (double) ThreadLocalRandom.current().nextLong(3, 6);
+            long amountOfReviews = ThreadLocalRandom.current().nextLong(1, 51);
+
             Branch branch = Branch.builder()
                     .name(name)
                     .address(address)
                     .dailyLoad(dailyLoad)
                     .load(load)
+                    .grade(grade)
+                    .amountOfReviews(amountOfReviews)
                     .x(x)
                     .y(y)
                     .build();
@@ -101,43 +124,20 @@ public class Moretech5backApplication extends SpringBootServletInitializer {
         }
     }
 
-    private void parseAtms(BranchService branchService, JsonArray array) {
+    private void parseAtms(ATMService atmService, JsonObject object) {
+        JsonArray array = object.get("atms").getAsJsonArray();
         for (JsonElement jsonElement : array) {
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            String name = jsonObject.get("salePointName").getAsString();
             String address = jsonObject.get("address").getAsString();
-            SortedMap<DayOfWeek, DaySchedule> dailyLoad = new TreeMap<>(this::compare);
-            for (DayOfWeek dayOfWeek : dayOfWeekList) {
-                String hours;
-                boolean works;
-                Long load = ThreadLocalRandom.current().nextLong(1, 11);
-                if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
-                    hours = "выходной";
-                    works = false;
-                } else {
-                    hours = "09:00-18:00";
-                    works = true;
-                }
-                DaySchedule daySchedule = DaySchedule.builder()
-                        .hours(hours)
-                        .load(load)
-                        .works(works)
-                        .build();
-                dailyLoad.put(dayOfWeek, daySchedule);
-            }
-            Long load = ThreadLocalRandom.current().nextLong(1, 11);
             double x = jsonObject.get("latitude").getAsDouble();
             double y = jsonObject.get("longitude").getAsDouble();
 
-            Branch branch = Branch.builder()
-                    .name(name)
+            ATM atm = ATM.builder()
                     .address(address)
-                    .dailyLoad(dailyLoad)
-                    .load(load)
                     .x(x)
                     .y(y)
                     .build();
-            branchService.save(branch);
+            atmService.save(atm);
         }
     }
 

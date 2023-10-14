@@ -25,6 +25,14 @@ public class BranchService {
         return new ArrayList<>(all.subList(0, Math.min(all.size(), 100)));
     }
 
+    public void setLoad(String name, Long load) throws BranchNotFoundException {
+        Branch existing = branchRepository.findByName(name).orElseThrow(BranchNotFoundException::new);
+        existing.setLoad(load);
+        branchRepository.save(existing);
+    }
+
+
+    // point = 4 min
     public List<Branch> findOptimal(double xMe, double yMe) {
         Comparator<Branch> comparator = (branch1, branch2) -> {
             double dist1 = distancePoints(branch1, xMe, yMe);
@@ -41,14 +49,20 @@ public class BranchService {
     }
 
     private double distancePoints(Branch branch, double xMe, double yMe) {
-        double km = distanceDegrees(branch, xMe, yMe) * 111_139 / 1000;
-        if (km < 3)
-            return 1;
-        return (km - 3) / 10 + 1;
+        double km = distanceKm(branch.getX(), branch.getY(), xMe, yMe);
+        return km / 4 + 1;
     }
 
-    private double distanceDegrees(Branch branch, double xMe, double yMe) {
-        return Math.sqrt(Math.pow(branch.getX() - xMe, 2) + Math.pow(branch.getY() - yMe, 2));
+    private double distanceKm(double branchX, double branchY, double xMe, double yMe){  // generally used geo measurement function
+        var R = 6378.137; // Radius of earth in KM
+        var dLat = xMe * Math.PI / 180 - branchX * Math.PI / 180;
+        var dLon = yMe * Math.PI / 180 - branchY * Math.PI / 180;
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(branchX * Math.PI / 180) * Math.cos(xMe * Math.PI / 180) *
+                        Math.sin(dLon/2) * Math.sin(dLon/2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        var d = R * c;
+        return d; // km
     }
 
     public void save(Branch branch) {

@@ -20,6 +20,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class BranchController {
     private final BranchService branchService;
 
+    @PostMapping("/set-load")
+    public ResponseEntity<Void> list(
+            @RequestData BranchSetLoadRequest request) {
+        log.info("setting_load: " + request.getName());
+        try {
+            branchService.setLoad(request.getName(), request.getLoad());
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (BranchNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
     @PostMapping("/list")
     public ResponseEntity<BranchListResponse> list() {
         log.info("returning_branch_list");
