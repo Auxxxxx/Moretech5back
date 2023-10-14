@@ -3,12 +3,9 @@ package com.example.moretech5back.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.geo.Point;
+import org.hibernate.annotations.BatchSize;
 
-import java.io.Serializable;
-import java.sql.Time;
 import java.time.DayOfWeek;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -19,18 +16,14 @@ import java.util.SortedMap;
 @AllArgsConstructor
 @Builder
 @ToString(onlyExplicitlyIncluded = true)
-@Table(name = "branch")
-public class Branch implements Serializable {
+@Table(name = "day_schedule")
+public class DaySchedule {
     @Id
     @GeneratedValue
     @JsonIgnore
     @ToString.Include
     private Long id;
-    private String name;
-    private String address;
-    @ManyToMany(cascade = CascadeType.ALL)
-    private SortedMap<DayOfWeek, DaySchedule> dailyLoad;
+    private String hours;
     private Long load;
-    private Double x;
-    private Double y;
+    private Boolean works;
 }

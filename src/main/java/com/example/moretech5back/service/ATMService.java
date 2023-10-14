@@ -2,18 +2,18 @@ package com.example.moretech5back.service;
 
 import com.example.moretech5back.exception.BranchNotFoundException;
 import com.example.moretech5back.model.Branch;
-import com.example.moretech5back.model.DaySchedule;
 import com.example.moretech5back.repository.BranchRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.DayOfWeek;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
-public class BranchService {
+public class ATMService {
     private final BranchRepository branchRepository;
 
     public List<Branch> listAll() {

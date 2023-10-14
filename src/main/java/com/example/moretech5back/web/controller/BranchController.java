@@ -45,6 +45,19 @@ public class BranchController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/find-optimal")
+    public ResponseEntity<BranchFindOptimalResponse> findInRange(
+            @RequestData BranchFindOptimalRequest request) {
+        log.info("returning_branch_list_in_range: " + request.toString());
+        var branches = branchService.findOptimal(
+                request.getXMe(),
+                request.getYMe());
+        var response = BranchFindOptimalResponse.builder()
+                .branches(branches)
+                .build();
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/get")
     public ResponseEntity<BranchGetResponse> get(
             @RequestData BranchGetRequest request) {
