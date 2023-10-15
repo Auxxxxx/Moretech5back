@@ -8,13 +8,14 @@
         <version>3.0.6</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
+
     <groupId>Moretech5back</groupId>
     <artifactId>ROOT</artifactId>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <name>Moretech5back</name>
     <description>Demo project for Spring Boot</description>
     <properties>
-        <java.version>20</java.version>
+        <java.version>17</java.version>
     </properties>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
